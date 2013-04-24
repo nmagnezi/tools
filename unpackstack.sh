@@ -107,4 +107,4 @@ for i in $Hosts ; do
     ssh root@$i /tmp/tmpcleaner.sh 
     ssh root@$i rm -f /tmp/tmpcleaner.sh
 done;
-#cleanUp
+cleanUp

@@ -30,7 +30,7 @@ generateCleanerScript()
   echo 'echo Stopping Running Instances' >> /tmp/tmpcleaner.sh
   echo 'for x in \$(virsh list --all | grep instance- | awk '{print \$2}') ; do virsh destroy $x ; virsh undefine $x ; done ;' >> /tmp/tmpcleaner.sh
   echo 'echo Removing Folders' >> /tmp/tmpcleaner.sh
-  echo 'pushd /var/ > /deb/null && for svc in nova glance cinder keystone puppet; do   rm -rf $svc ; done && popd > /dev/null' >> /tmp/tmpcleaner.sh
+  echo 'pushd /var/ > /dev/null && for svc in nova glance cinder keystone puppet; do   rm -rf $svc ; done && popd > /dev/null' >> /tmp/tmpcleaner.sh
   echo 'pushd /var/lib > /dev/null && for svc in nova glance cinder keystone puppet openstack-dashboard mysql qpid; do   rm -rf $svc ; done && popd > /dev/null' >> /tmp/tmpcleaner.sh
   echo 'pushd /etc/ > /dev/null && for svc in nova glance cinder keystone puppet swift openstack-dashboard; do   rm -rf $svc; done'  >> /tmp/tmpcleaner.sh
   echo 'rm -f /root/.my.cnf' >> /tmp/tmpcleaner.sh

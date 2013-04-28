@@ -24,11 +24,11 @@ generateCleanerScript()
   echo '#!/bin/bash' > /tmp/tmpcleaner.sh
   echo 'echo Removing Running Instances via LibVirt' >> /tmp/tmpcleaner.sh
   echo 'for x in $(virsh list --all | grep instance- | awk '{print $2}') ; do virsh destroy $x ; virsh undefine $x ; done ;' >> /tmp/tmpcleaner.sh
+  echo 'killall dnsmasq &> /dev/null' >> /tmp/tmpcleaner.sh 
   echo 'echo Removing OpenStack Packages' >> /tmp/tmpcleaner.sh
   echo 'yum remove -y *openstack* *nova* *keystone* *glance* *cinder* *swift* qpid-cpp* python-qpid puppet novnc mysql mysql-server httpd perl-DBI perl-DBD-MySQL' >> /tmp/tmpcleaner.sh
-  echo 'ps -ef | grep -i repli | grep swift | awk '{print \$2}' | xargs kill' >> /tmp/tmpcleaner.sh
+  echo 'ps -ef | grep -i repli | grep swift | awk '{print $2}' | xargs kill' >> /tmp/tmpcleaner.sh
   echo 'umount /srv/node/device*' >> /tmp/tmpcleaner.sh
-  echo 'killall dnsmasq &> /dev/null' >> /tmp/tmpcleaner.sh
   echo 'echo Removing Folders' >> /tmp/tmpcleaner.sh
   echo 'pushd /var/ > /dev/null && for svc in nova glance cinder keystone puppet; do   rm -rf $svc ; done && popd > /dev/null' >> /tmp/tmpcleaner.sh
   echo 'pushd /var/lib > /dev/null && for svc in nova glance cinder keystone puppet openstack-dashboard mysql qpid; do   rm -rf $svc ; done && popd > /dev/null' >> /tmp/tmpcleaner.sh

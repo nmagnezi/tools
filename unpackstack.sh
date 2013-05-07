@@ -30,7 +30,7 @@ generateCleanerScript()
   echo 'ps -ef | grep -i repli | grep swift | awk '{print $2}' | xargs kill' >> /tmp/tmpcleaner.sh
   echo 'umount /srv/node/device*' >> /tmp/tmpcleaner.sh
   echo 'echo Removing Folders' >> /tmp/tmpcleaner.sh
-  echo 'pushd /var/ > /dev/null && for svc in nova glance cinder keystone puppet; do   rm -rf $svc ; done && popd > /dev/null' >> /tmp/tmpcleaner.sh
+  echo 'pushd /var/log > /dev/null && for svc in nova glance cinder keystone puppet; do   rm -rf $svc ; done && popd > /dev/null' >> /tmp/tmpcleaner.sh
   echo 'pushd /var/lib > /dev/null && for svc in nova glance cinder keystone puppet openstack-dashboard mysql qpid; do   rm -rf $svc ; done && popd > /dev/null' >> /tmp/tmpcleaner.sh
   echo 'pushd /etc/ > /dev/null && for svc in nova glance cinder keystone puppet swift openstack-dashboard; do   rm -rf $svc; done'  >> /tmp/tmpcleaner.sh
   echo 'rm -f /root/.my.cnf' >> /tmp/tmpcleaner.sh

@@ -1,3 +1,5 @@
+# this script is used to integrate hurricane deployer with robot tests in one jenkins job.
+
 python hurricane/jenkins.py
 python hurricane/main.py
 

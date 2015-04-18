@@ -3,7 +3,7 @@
 import argparse
 import logging
 import paramiko
-import paramikoe
+import sshutils
 
 LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.DEBUG)
@@ -30,12 +30,18 @@ class SSH(object):
                          timeout=SSH_TIMEOUT)
 
     def run_bash_command(self, bash_command):
-        interact = paramikoe.SSHClientInteraction(self.ssh,
-                                                  timeout=10,
-                                                  display=False)
-        interact.send(bash_command)
-        interact.tail(line_prefix='%(ip)s: ' % {"ip": self.args.ip_address})
+        _, ssh_stdout, _ = self.ssh.exec_command("hostname")
+        prompt = ("%(user)s@%(host)s tempest" %
+                  {"user": self.args.username,
+                   "host": (ssh_stdout.read()).strip().split(".")[0]})
+        channel = self.ssh.invoke_shell()
+        channel.send(bash_command + '\n')
 
+        buffer = ''
+        while buffer.find(prompt) < 0:
+            response = channel.recv(9999)
+            buffer += response
+            print(response)
 
 def process_args():
     parser = argparse.ArgumentParser(description='Tempest runner for Devstack')
@@ -71,11 +77,13 @@ def init_cmd(args):
 def main():
     args = process_args()
     LOG.info("Processed args: %(args)s" % {"args": args})
-    ssh = SSH(args)
-    ssh.open_connection()
+    ssh = sshutils.SSH(host=args.ip_address,
+                       user=args.username,
+                       password=args.password)
+    ssh._get_client()
     cmd = init_cmd(args)
     LOG.info('Command to execute: %(cmd)s' % {"cmd": cmd})
-    ssh.run_bash_command(cmd)
+    ssh.run(cmd)
 
 if __name__ == '__main__':
     main()

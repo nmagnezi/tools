@@ -3,7 +3,7 @@
 import argparse
 import logging
 import paramiko
-import select
+import paramikoe
 
 LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.DEBUG)
@@ -30,13 +30,11 @@ class SSH(object):
                          timeout=SSH_TIMEOUT)
 
     def run_bash_command(self, bash_command):
-        transport = self.ssh.get_transport()
-        channel = transport.open_session()
-        channel.exec_command(bash_command)
-        while True:
-            rl, wl, xl = select.select([channel], [], [], 0.0)
-            if len(rl) > 0:
-                print channel.recv(1024)
+        interact = paramikoe.SSHClientInteraction(self.ssh,
+                                                  timeout=10,
+                                                  display=False)
+        interact.send(bash_command)
+        interact.tail(line_prefix='%(ip)s: ' % {"ip": self.args.ip_address})
 
 
 def process_args():
@@ -72,13 +70,12 @@ def init_cmd(args):
 
 def main():
     args = process_args()
+    LOG.info("Processed args: %(args)s" % {"args": args})
     ssh = SSH(args)
     ssh.open_connection()
     cmd = init_cmd(args)
-    _, ssh_stdout, stderr = ssh.run_bash_command(cmd)
-    print ssh_stdout
-    print stderr
-
+    LOG.info('Command to execute: %(cmd)s' % {"cmd": cmd})
+    ssh.run_bash_command(cmd)
 
 if __name__ == '__main__':
     main()

@@ -1,4 +1,4 @@
-# Copied from Rally/common
+# Copied from Rally/lientommon
 
 # Copyright 2013: Mirantis Inc.
 # All Rights Reserved.

@@ -3,7 +3,8 @@
 import argparse
 import logging
 import paramiko
-import sshutils
+import select
+import time
 
 LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.DEBUG)
@@ -23,13 +24,23 @@ class SSH(object):
         self.args = args
 
     def open_connection(self):
-        self.ssh.set_missing_host_key_policy(paramiko.WarningPolicy())
-        self.ssh.connect(hostname=self.args.ip_address,
-                         username=self.args.username,
-                         password=self.args.password,
-                         timeout=SSH_TIMEOUT)
+        try:
+            self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            self.ssh.connect(hostname=self.args.ip_address,
+                             username=self.args.username,
+                             password=self.args.password,
+                             timeout=SSH_TIMEOUT,
+                             allow_agent=False,
+                             look_for_keys=False)
+        except Exception as e:
+            error = ("Exception was raised while attempting to establish "
+                     "connection: %(exception_type)s. "
+                     "Exception value is: %(exception)r"
+                     % {"exception": e, "exception_type": type(e)})
 
-    def run_bash_command(self, bash_command):
+            raise error
+
+    def run_bash_command2(self, bash_command):
         _, ssh_stdout, _ = self.ssh.exec_command("hostname")
         prompt = ("%(user)s@%(host)s tempest" %
                   {"user": self.args.username,
@@ -42,6 +53,7 @@ class SSH(object):
             response = channel.recv(9999)
             buffer += response
             print(response)
+
 
 def process_args():
     parser = argparse.ArgumentParser(description='Tempest runner for Devstack')
@@ -77,13 +89,12 @@ def init_cmd(args):
 def main():
     args = process_args()
     LOG.info("Processed args: %(args)s" % {"args": args})
-    ssh = sshutils.SSH(host=args.ip_address,
-                       user=args.username,
-                       password=args.password)
-    ssh._get_client()
+    ssh = SSH(args)
+    ssh.open_connection()
     cmd = init_cmd(args)
     LOG.info('Command to execute: %(cmd)s' % {"cmd": cmd})
-    ssh.run(cmd)
+    ssh.run_bash_command2(cmd)
+    ssh.close()
 
 if __name__ == '__main__':
     main()

@@ -40,19 +40,22 @@ class SSH(object):
 
             raise error
 
-    def run_bash_command2(self, bash_command):
+    def close_connection(self):
+        self.ssh.close()
+
+    def run_bash_command(self, bash_command):
         _, ssh_stdout, _ = self.ssh.exec_command("hostname")
         prompt = ("%(user)s@%(host)s tempest" %
                   {"user": self.args.username,
                    "host": (ssh_stdout.read()).strip().split(".")[0]})
-        channel = self.ssh.invoke_shell()
-        channel.send(bash_command + '\n')
+        channel = self.ssh.invoke_shell(term="xterm-256color")
+        channel.send(bash_command)
 
-        buffer = ''
-        while buffer.find(prompt) < 0:
+        buff = ''
+        while buff.find(prompt):
             response = channel.recv(9999)
-            buffer += response
-            print(response)
+            buff += response
+            LOG.info(response)
 
 
 def process_args():
@@ -93,8 +96,8 @@ def main():
     ssh.open_connection()
     cmd = init_cmd(args)
     LOG.info('Command to execute: %(cmd)s' % {"cmd": cmd})
-    ssh.run_bash_command2(cmd)
-    ssh.close()
+    ssh.run_bash_command(cmd)
+    ssh.close_connection()
 
 if __name__ == '__main__':
     main()

@@ -15,6 +15,10 @@ TESTENV = 'all'
 TEMPEST_DIRECTORY = "/opt/openstack/tempest"
 
 
+class Exp(Exception):
+    pass
+
+
 def process_args():
     parser = argparse.ArgumentParser(description='Tempest runner for Devstack')
 
@@ -48,7 +52,7 @@ def main():
     except Exception as e:
         err = ("Exception %(exception_type)s was raised "
                "during tempest run. Exception value is: %(exception)r")
-        raise err % {"exception": e, "exception_type": type(e)}
+        raise err % Exp({"exception": e, "exception_type": type(e)})
 
     finally:
         LOG.info('Done')

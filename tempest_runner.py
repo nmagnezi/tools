@@ -31,8 +31,7 @@ def process_args():
 
 
 def init_cmd(args):
-    cmd = "cd %(dir)s && tox -e %(env)s" % {"dir": args.directory,
-                                            "env": args.env}
+    cmd = "tox -e %(env)s" % {"env": args.env}
     if args.testr:
         return " ".join([cmd, args.testr])
     return cmd

@@ -43,8 +43,15 @@ def main():
     LOG.info("Processed args: %(args)s" % {"args": args})
     cmd = init_cmd(args)
     LOG.info('Command to execute: %(cmd)s' % {"cmd": cmd})
-    subprocess.check_call(['cd', args.directory])
-    subprocess.check_call(cmd.split())
+    try:
+        subprocess.check_call(cmd.split())
+    except Exception as e:
+        err = ("Exception %(exception_type)s was raised "
+               "during tempest run. Exception value is: %(exception)r")
+        raise err % {"exception": e, "exception_type": type(e)}
+
+    finally:
+        LOG.info('Done')
 
 if __name__ == '__main__':
     main()

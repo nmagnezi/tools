@@ -13,7 +13,8 @@ LOG.addHandler(console)
 
 TESTENV = 'all'
 TEMPEST_DIRECTORY = "/opt/openstack/tempest"
-
+RESULTS_XML = "nosetests"
+TEMPEST_LOG = "tempest.log"
 
 class Exp(Exception):
     pass
@@ -35,11 +36,15 @@ def process_args():
 
 
 def init_cmd(args):
-    cmd = ("tox -c %(directory)s/tox.ini -e %(env)s"
-           % {"env": args.env, "directory": args.directory})
+    cmd = list()
+    cmd.append("tox -c %(directory)s/tox.ini -e %(env)s --subunit"
+               % {"env": args.env, "directory": args.directory})
     if args.testr:
-        return " ".join([cmd, args.testr])
-    return cmd
+        cmd.append(args.testr)
+    cmd.append("| tee >( subunit2junitxml --output-to=%(results)s.xml ) "
+               "| subunit-2to1 | tee %(log)s | tools/colorizer.py"
+               % {"results": RESULTS_XML, "log": TEMPEST_LOG})
+    return " ".join(cmd)
 
 
 def main():

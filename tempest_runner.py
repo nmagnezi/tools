@@ -16,6 +16,7 @@ TEMPEST_DIRECTORY = "/opt/openstack/tempest"
 RESULTS_XML = "nosetests"
 TEMPEST_LOG = "tempest.log"
 
+
 class Exp(Exception):
     pass
 

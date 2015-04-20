@@ -37,7 +37,7 @@ def process_args():
 
 def init_cmd(args):
     cmd = list()
-    cmd.append("tox -c %(directory)s/tox.ini -e %(env)s --subunit"
+    cmd.append("tox -c %(directory)s/tox.ini -e %(env)s -- --subunit"
                % {"env": args.env, "directory": args.directory})
     if args.testr:
         cmd.append(args.testr)

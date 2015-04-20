@@ -60,7 +60,7 @@ def main():
     except Exception as e:
         err = ("Exception %(exception_type)s was raised "
                "during tempest run. Exception value is: %(exception)r")
-        raise err % Exp({"exception": e, "exception_type": type(e)})
+        raise Exp(err % {"exception": e, "exception_type": type(e)})
 
     finally:
         LOG.info('Done')

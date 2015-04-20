@@ -1,15 +1,6 @@
 #!/usr/bin/env python
 
 import argparse
-import logging
-import subprocess
-
-
-LOG = logging.getLogger(__name__)
-LOG.setLevel(logging.DEBUG)
-console = logging.StreamHandler()
-LOG.addHandler(console)
-
 
 TESTENV = 'all'
 TEMPEST_DIRECTORY = "/opt/openstack/tempest"
@@ -53,18 +44,8 @@ def init_cmd(args):
 
 def main():
     args = process_args()
-    LOG.info("Processed args: %(args)s" % {"args": args})
     cmd = init_cmd(args)
-    LOG.info('Command to execute: %(cmd)s' % {"cmd": cmd})
-    try:
-        subprocess.check_call(cmd.split())
-    except Exception as e:
-        err = ("Exception %(exception_type)s was raised "
-               "during tempest run. Exception value is: %(exception)r")
-        raise Exp(err % {"exception": e, "exception_type": type(e)})
-
-    finally:
-        LOG.info('Done')
+    print '%(cmd)s' % {"cmd": cmd}
 
 if __name__ == '__main__':
     main()

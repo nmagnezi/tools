@@ -26,8 +26,8 @@ def init_cmd(args):
     if args.tests:
         cmd.append(args.tests)
     cmd.append("--subunit | tee >(subunit2junitxml "
-               "--output-to=%(directory)s/tempest/%(results)s.xml) "
-               "| subunit-2to1 tee %(directory)s/%(log)s "
+               "--output-to=%(directory)s/%(results)s.xml) "
+               "| subunit-2to1 | tee %(directory)s/%(log)s "
                "| %(directory)s/tools/colorizer.py"
                % {"results": RESULTS_XML,
                   "log": TEMPEST_LOG,

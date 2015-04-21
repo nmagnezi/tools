@@ -45,6 +45,7 @@ def generate_runner_script(cmd, args):
                  % {"directory": args.directory})
     lines.append("find . -type f -name '*.pyc' -delete\n")
     lines.append("pip install junitxml\n")
+    lines.append("testr init\n")
     lines.append("echo > %(directory)s/%(log)s\n"
                  % {"directory": args.directory, "log": TEMPEST_LOG})
     lines.append("".join([cmd, "\n"]))

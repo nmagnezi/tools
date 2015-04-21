@@ -39,7 +39,6 @@ def init_cmd(args):
 def generate_runner_script(cmd, args):
     lines = list()
     lines.append("#!/bin/bash\n")
-    lines.append("set +x\n")
     lines.append("python %(directory)s/tools/install_venv.py "
                  "--no-site-packages\n" % {"directory": args.directory})
     lines.append("source %(directory)s/.venv/bin/activate\n"

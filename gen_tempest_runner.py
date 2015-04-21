@@ -39,6 +39,7 @@ def init_cmd(args):
 def generate_runner_script(cmd, args):
     lines = list()
     lines.append("#!/bin/bash\n")
+    lines.append("set +x")
     lines.append("python %(directory)s/tools/install_venv.py "
                  "--no-site-packages\n" % {"directory": args.directory})
     lines.append("source %(directory)s/.venv/bin/activate\n"
@@ -49,6 +50,7 @@ def generate_runner_script(cmd, args):
     lines.append("echo > %(directory)s/%(log)s\n"
                  % {"directory": args.directory, "log": TEMPEST_LOG})
     lines.append("".join([cmd, "\n"]))
+    lines.append("exit 0\n")
 
     with open("tempest.sh", 'w') as fo:
         for line in lines:

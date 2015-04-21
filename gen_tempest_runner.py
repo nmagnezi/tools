@@ -40,7 +40,7 @@ def generate_runner_script(cmd, args):
     lines.append("#!/bin/bash\n")
     lines.append("python %(directory)s/tools/install_venv.py "
                  "--no-site-packages\n" % {"directory": args.directory})
-    lines.append("source %(directory)s/tempest/.venv/bin/activate\n"
+    lines.append("source %(directory)s/.venv/bin/activate\n"
                  % {"directory": args.directory})
     lines.append("find . -type f -name '*.pyc' -delete\n")
     lines.append("pip install junitxml\n")

@@ -32,6 +32,7 @@ def init_cmd(args):
                % {"results": RESULTS_XML,
                   "log": TEMPEST_LOG,
                   "directory": args.directory})
+    print "Generated Command: %(cmd)s" % {"cmd": cmd}
     return " ".join(cmd)
 
 

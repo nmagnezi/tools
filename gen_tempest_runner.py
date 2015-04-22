@@ -2,7 +2,6 @@
 
 import argparse
 
-TESTENV = 'all'
 TEMPEST_DIRECTORY = "/opt/openstack/tempest"
 RESULTS_XML = "xunit"
 TEMPEST_LOG = "tempest.log"

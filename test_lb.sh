@@ -35,7 +35,7 @@ DEVSTACK_LBAAS_SSH_KEY_DIR=${TOP_DIR}
 DEVSTACK_LBAAS_SSH_KEY=${DEVSTACK_LBAAS_SSH_KEY_DIR}/${DEVSTACK_LBAAS_SSH_KEY_NAME}
 rm -f ${DEVSTACK_LBAAS_SSH_KEY}.pub ${DEVSTACK_LBAAS_SSH_KEY}
 ssh-keygen -b 2048 -t rsa -f ${DEVSTACK_LBAAS_SSH_KEY} -N ""
-nova keypair-add --pub_key=${DEVSTACK_LBAAS_SSH_KEY}.pub ${DEVSTACK_LBAAS_SSH_KEY_NAME}
+nova keypair-add --pub-key=${DEVSTACK_LBAAS_SSH_KEY}.pub ${DEVSTACK_LBAAS_SSH_KEY_NAME}
 
 # Add tcp/22,80 and icmp to default security group
 nova secgroup-add-rule default tcp 22 22 0.0.0.0/0

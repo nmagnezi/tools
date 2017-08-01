@@ -23,10 +23,9 @@ DEST=${DEST:-/opt/stack}
 IMAGE_NAME="cirros"
 SUBNET_NAME="private-subnet"
 
-
-
 # Get OpenStack demo user auth
 source ${TOP_DIR}/openrc demo demo
+DEMO_PROJECT_ID=$(openstack project list | awk '/ demo/ {print $2}')
 
 # Create an SSH key to use for the instances
 HOST=$(echo $HOSTNAME | cut -d"." -f1)
@@ -38,6 +37,10 @@ ssh-keygen -b 2048 -t rsa -f ${DEVSTACK_LBAAS_SSH_KEY} -N ""
 nova keypair-add --pub-key=${DEVSTACK_LBAAS_SSH_KEY}.pub ${DEVSTACK_LBAAS_SSH_KEY_NAME}
 
 # Add tcp/22,80 and icmp to default security group
+openstack security group rule create $DEMO_PROJECT_ID --protocol tcp --dst-port 22 
+openstack security group rule create $DEMO_PROJECT_ID --protocol tcp --dst-port 80
+openstack security group rule create $DEMO_PROJECT_ID --protocol icmp 
+
 nova secgroup-add-rule default tcp 22 22 0.0.0.0/0
 nova secgroup-add-rule default tcp 80 80 0.0.0.0/0
 nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0

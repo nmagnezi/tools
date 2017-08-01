@@ -36,14 +36,11 @@ rm -f ${DEVSTACK_LBAAS_SSH_KEY}.pub ${DEVSTACK_LBAAS_SSH_KEY}
 ssh-keygen -b 2048 -t rsa -f ${DEVSTACK_LBAAS_SSH_KEY} -N ""
 nova keypair-add --pub-key=${DEVSTACK_LBAAS_SSH_KEY}.pub ${DEVSTACK_LBAAS_SSH_KEY_NAME}
 
-# Add tcp/22,80 and icmp to default security group
-openstack security group rule create $DEMO_PROJECT_ID --protocol tcp --dst-port 22 
-openstack security group rule create $DEMO_PROJECT_ID --protocol tcp --dst-port 80
-openstack security group rule create $DEMO_PROJECT_ID --protocol icmp 
-
-nova secgroup-add-rule default tcp 22 22 0.0.0.0/0
-nova secgroup-add-rule default tcp 80 80 0.0.0.0/0
-nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0
+# Add tcp/22,80 and icmp to default security 
+DEMO_SEC_GROUP_ID=$(openstack security group list --project $DEMO_PROJECT_ID | awk '/ default/ {print $2}')
+openstack security group rule create $DEMO_SEC_GROUP_ID --protocol tcp --dst-port 22 
+openstack security group rule create $DEMO_SEC_GROUP_ID --protocol tcp --dst-port 80
+openstack security group rule create $DEMO_SEC_GROUP_ID --protocol icmp 
 
 # Get Image id
 IMAGE_ID=$(glance image-list | awk -v image=${IMAGE_NAME} '$0 ~ image {print $2}' | head -1)

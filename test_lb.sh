@@ -59,8 +59,8 @@ sleep ${BOOT_DELAY}
 
 # Get Instances IP Addresses
 SUBNET_ID=$(neutron subnet-show ${SUBNET_NAME} | awk '/ id / {print $4}')
-IP1=$(neutron port-list --device_owner compute:None -c fixed_ips | grep ${SUBNET_ID} | cut -d'"' -f8 | sed -n 1p)
-IP2=$(neutron port-list --device_owner compute:None -c fixed_ips | grep ${SUBNET_ID} | cut -d'"' -f8 | sed -n 2p)
+IP1=$(neutron port-list --device_owner compute:nova -c fixed_ips | grep ${SUBNET_ID} | cut -d'"' -f8 | sed -n 1p)
+IP2=$(neutron port-list --device_owner compute:nova -c fixed_ips | grep ${SUBNET_ID} | cut -d'"' -f8 | sed -n 2p)
 
 ssh-keygen -R ${IP1}
 ssh-keygen -R ${IP2}

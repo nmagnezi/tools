@@ -29,7 +29,7 @@ cp /home/$USER/.ssh/authorized_keys /opt/stack/.ssh
 chown -R stack:stack /opt/stack/.ssh/
 chmod 700 /opt/stack/.ssh
 chmod 600 /opt/stack/.ssh/authorized_keys
-yum install -y vim git || apt-get install -y vim git
+yum install -y vim git wget || apt-get install -y vim git wget
 sudo -u stack sudo git clone https://git.openstack.org/openstack-dev/devstack /opt/stack/devstack
 chown -R stack:stack /opt/stack/devstack
 

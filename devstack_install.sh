@@ -3,7 +3,7 @@
 # Just the basics of setting a cloud image based instance to be ready for devstack
 
 if [[ $EUID -ne 0 ]]; then
-   echo "This script must be run as root" 
+   echo "This script must be run as root"
    exit 1
 fi
 

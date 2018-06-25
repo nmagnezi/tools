@@ -3,7 +3,7 @@
 # Just the basics of setting a cloud image based instance to be ready for devstack
 
 if [[ $EUID -ne 0 ]]; then
-   echo "This script must be run as root" 
+   echo "This script must be run as root"
    exit 1
 fi
 
@@ -14,7 +14,7 @@ export SERVER_OS=$(awk -F "=" '/^NAME/ {print $2}' /etc/*-release)
 if [[ "$SERVER_OS" == '"CentOS Linux"' ]]; then
     export USER=centos
 else
-    # "Ubutnu"
+    # "Ubuntu"
     export USER=ubuntu
 fi
 

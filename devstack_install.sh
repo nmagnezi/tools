@@ -14,7 +14,7 @@ export SERVER_OS=$(awk -F "=" '/^NAME/ {print $2}' /etc/*-release)
 if [[ "$SERVER_OS" == '"CentOS Linux"' ]]; then
     export USER=centos
 else
-    # "Ubutnu"
+    # "Ubuntu"
     export USER=ubuntu
 fi
 

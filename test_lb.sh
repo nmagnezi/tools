@@ -5,7 +5,7 @@ set -ex
 # up a Neutron LBaaS Version 2 loadbalancer backed by Octavia.
 
 # Keep track of the DevStack directory
-TOP_DIR=$(cd $(dirname "$0") && pwd)
+TOP_DIR="/opt/stack/devstack"
 BOOT_DELAY=60
 
 # Import common functions

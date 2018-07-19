@@ -8,6 +8,7 @@ set -ex
 TOP_DIR="/opt/stack/devstack"
 BOOT_DELAY=40
 PROJECT_NAME="admin"
+LB_NAME="lb1"
 
 # Import common functions
 source ${TOP_DIR}/functions
@@ -36,7 +37,7 @@ source ${TOP_DIR}/openrc ${PROJECT_NAME} ${PROJECT_NAME}
 
 # Create loadbalancer
 SUBNET_ID=$(openstack subnet show private-subnet -f value -c id)
-openstack loadbalancer create --name lb1 --vip-subnet-id $SUBNET_ID
+openstack loadbalancer create --name $LB_NAME --vip-subnet-id $SUBNET_ID
 
 # Create an SSH key to use for the instances
 DEVSTACK_LBAAS_SSH_KEY_NAME=DEVSTACK_LBAAS_SSH_KEY_RSA
@@ -79,17 +80,17 @@ $NAMESPACE_CMD_PREFIX $NAMESPACE_NAME ssh -o UserKnownHostsFile=/dev/null -i ${D
 $NAMESPACE_CMD_PREFIX $NAMESPACE_NAME ssh -o UserKnownHostsFile=/dev/null -i ${DEVSTACK_LBAAS_SSH_KEY} -o StrictHostKeyChecking=no -q cirros@${IP2} "screen -d -m sh webserver.sh"
 
 
-wait_for_loadbalancer_active lb1
-openstack loadbalancer listener create lb1 --protocol HTTP --protocol-port 80 --name listener1
-wait_for_loadbalancer_active lb1
+wait_for_loadbalancer_active $LB_NAME
+openstack loadbalancer listener create $LB_NAME --protocol HTTP --protocol-port 80 --name listener1
+wait_for_loadbalancer_active $LB_NAME
 openstack loadbalancer pool create --lb-algorithm ROUND_ROBIN --listener listener1 --protocol HTTP --name pool1
-wait_for_loadbalancer_active lb1
+wait_for_loadbalancer_active $LB_NAME
 openstack loadbalancer member create --subnet-id $SUBNET_ID --address ${IP1} --protocol-port 80 pool1
-wait_for_loadbalancer_active lb1
+wait_for_loadbalancer_active $LB_NAME
 openstack loadbalancer member create --subnet-id $SUBNET_ID --address ${IP2} --protocol-port 80 pool1
 
 
 echo "How to test load balancing:"
 echo ""
-echo "${NAMESPACE_CMD_PREFIX} ${NAMESPACE_NAME} curl $(openstack loadbalancer show lb1 -f value -c vip_address)"
+echo "${NAMESPACE_CMD_PREFIX} ${NAMESPACE_NAME} curl $(openstack loadbalancer show ${LB_NAME} -f value -c vip_address)"
 echo ""

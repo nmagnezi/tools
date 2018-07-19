@@ -49,7 +49,7 @@ openstack keypair create --public-key=${DEVSTACK_LBAAS_SSH_KEY}.pub ${DEVSTACK_L
 # Add tcp/22,80 and icmp to default security group
 
 PROJECT_ID=$(openstack project show ${PROJECT_NAME} -f value -c id)
-DEFAULT_SEC_GROUP_ID=$(openstack security group list --project 9d87e337622a4c5b9ac7b3c5e3f14f04 | awk '/default/ {print $2}')
+DEFAULT_SEC_GROUP_ID=$(openstack security group list --project ${PROJECT_ID} | awk '/default/ {print $2}')
 openstack security group rule create --protocol tcp --dst-port 22:22 ${DEFAULT_SEC_GROUP_ID}
 openstack security group rule create --protocol tcp --dst-port 80:80 ${DEFAULT_SEC_GROUP_ID}
 openstack security group rule create --protocol icmp ${DEFAULT_SEC_GROUP_ID}

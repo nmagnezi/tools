@@ -7,6 +7,7 @@ set -ex
 # Keep track of the DevStack directory
 TOP_DIR="/opt/stack/devstack"
 BOOT_DELAY=40
+PROJECT_NAME="admin"
 
 # Import common functions
 source ${TOP_DIR}/functions
@@ -31,7 +32,7 @@ cp /opt/stack/octavia/devstack/samples/singlenode/webserver.sh ${TOP_DIR}
 # Unset DOMAIN env variables that are not needed for keystone v2 and set OpenStack admin user auth
 unset OS_USER_DOMAIN_ID
 unset OS_PROJECT_DOMAIN_ID
-source ${TOP_DIR}/openrc admin admin
+source ${TOP_DIR}/openrc ${PROJECT_NAME} ${PROJECT_NAME}
 
 # Create loadbalancer
 SUBNET_ID=$(openstack subnet show private-subnet -f value -c id)
@@ -46,9 +47,12 @@ ssh-keygen -b 2048 -t rsa -f ${DEVSTACK_LBAAS_SSH_KEY} -N ""
 openstack keypair create --public-key=${DEVSTACK_LBAAS_SSH_KEY}.pub ${DEVSTACK_LBAAS_SSH_KEY_NAME}
 
 # Add tcp/22,80 and icmp to default security group
-openstack security group rule create --protocol tcp --dst-port 22:22 default
-openstack security group rule create --protocol tcp --dst-port 80:80 default
-openstack security group rule create --protocol icmp default
+
+PROJECT_ID=$(openstack project show ${PROJECT_NAME} -f value -c id)
+DEFAULT_SEC_GROUP_ID=$(openstack security group list --project 9d87e337622a4c5b9ac7b3c5e3f14f04 | awk '/default/ {print $2}')
+openstack security group rule create --protocol tcp --dst-port 22:22 ${DEFAULT_SEC_GROUP_ID}
+openstack security group rule create --protocol tcp --dst-port 80:80 ${DEFAULT_SEC_GROUP_ID}
+openstack security group rule create --protocol icmp ${DEFAULT_SEC_GROUP_ID}
 # Boot some instances
 NOVA_BOOT_ARGS="--key-name ${DEVSTACK_LBAAS_SSH_KEY_NAME} --image $(openstack image show cirros-0.3.5-x86_64-disk -f value -c id) --flavor 1 --nic net-id=$(openstack network show private -f value -c id)"
 

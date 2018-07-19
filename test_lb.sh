@@ -25,6 +25,9 @@ function wait_for_loadbalancer_active() {
   done
 }
 
+# Copy webserver.sh to devstack dir
+cp /opt/stack/octavia/devstack/samples/singlenode/webserver.sh ${TOP_DIR}
+
 # Unset DOMAIN env variables that are not needed for keystone v2 and set OpenStack admin user auth
 unset OS_USER_DOMAIN_ID
 unset OS_PROJECT_DOMAIN_ID

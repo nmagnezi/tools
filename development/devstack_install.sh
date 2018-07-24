@@ -36,7 +36,7 @@ chmod 600 /opt/stack/.ssh/authorized_keys
 yum install -y vim git tig wget || apt-get install -y vim git tig wget
 
 # Clone my scripts
-sudo -u stack sudo git clone https://github.com/nmagnezi/scripts.git /opt/stack/devstack
+sudo -u stack sudo git clone https://github.com/nmagnezi/scripts.git /opt/stack/scripts
 chown -R stack:stack /opt/stack/scripts
 
 

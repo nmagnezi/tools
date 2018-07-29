@@ -10,6 +10,9 @@
 ## Git tools
 * [Git Global Configuration](git/git_prep.sh)
 
+## Heat Stacks - OpenStack Tasks Automation
+* [Create Loadbalancer Tree](heat_stacks/lb_tree.yaml)
+
 ## Tester scripts
 
 ### Octavia

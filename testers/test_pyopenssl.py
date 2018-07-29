@@ -26,7 +26,6 @@ class HMACAuth(AuthBase):
         })
         return request
 
-#import ipdb ; ipdb.set_trace()
 session = requests.session()
 session.auth = HMACAuth()
 session.headers.update({'Accept': 'application/json',

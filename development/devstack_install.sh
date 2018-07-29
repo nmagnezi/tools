@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # Just the basics of setting a cloud image based instance to be ready for devstack
+# To Copy & Run:
+# curl https://raw.githubusercontent.com/nmagnezi/scripts/master/development/devstack_install.sh  > devstack_install.sh ; bash devstack_install.sh
 
 if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root"

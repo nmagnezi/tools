@@ -2,10 +2,19 @@
 
 # Test VIP traffic while monitoring the amps list
 
-VIP=10.0.0.11
-QROUTER_NAMESPACE=qrouter-106278e1-2c9f-4e67-a2f0-84c02b58a584
 
+LB_NAME="lb1"
+ROUTER_NAME="router1"
 LOG=$HOME/amp_test1.txt
+
+source $HOME/devstack/openrc admin admin
+
+VIP=$(openstack loadbalancer show "$LB_NAME" -f value -c vip_address)
+
+ROUTER_ID=$(openstack router show "$ROUTER_NAME" -f value -c id)
+
+QROUTER_NAMESPACE="qrouter-"$ROUTER_ID
+
 VIP_COMMAND="timeout 1s sudo ip netns exec "$QROUTER_NAMESPACE" curl "$VIP""
 QROUTER_NS_VIP_MAC_COMMAND=$(sudo ip netns exec "$QROUTER_NAMESPACE" arp -a | awk '/'$VIP'/ {print $2" "$3" "$4" "$7" "$8}')
 
@@ -21,7 +30,7 @@ while true; do
 	#fi
 
   # this is blocking when it does not work, so instead I used:
-  # while true ; do date ; curl 10.0.0.11 | tee -a /opt/stack/amp_test1.txt ; sleep 2 ; done
+  # while true ; do date ; curl $VIP | tee -a /opt/stack/amp_test1.txt ; sleep 2 ; done
   # Probably there's a better solution for this.
 
 	echo $QROUTER_NS_VIP_MAC_COMMAND | tee -a $LOG

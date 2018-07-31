@@ -16,7 +16,6 @@ ROUTER_ID=$(openstack router show "$ROUTER_NAME" -f value -c id)
 QROUTER_NAMESPACE="qrouter-"$ROUTER_ID
 
 VIP_COMMAND="timeout 1s sudo ip netns exec "$QROUTER_NAMESPACE" curl "$VIP""
-QROUTER_NS_VIP_MAC_COMMAND=$(sudo ip netns exec "$QROUTER_NAMESPACE" arp -a | awk '/'$VIP'/ {print $2" "$3" "$4" "$7" "$8}')
 
 touch $LOG
 echo "" > $LOG
@@ -29,11 +28,10 @@ while true; do
 	#    echo "VIP '$VIP' Not Responding" | tee -a $LOG
 	#fi
 
-  # this is blocking when it does not work, so instead I used:
-  # while true ; do date ; curl $VIP | tee -a /opt/stack/amp_test1.txt ; sleep 2 ; done
-  # Probably there's a better solution for this.
-
-	echo $QROUTER_NS_VIP_MAC_COMMAND | tee -a $LOG
+    # this is blocking when it does not work, so instead I used:
+    # while true ; do date ; curl $VIP | tee -a /opt/stack/amp_test1.txt ; sleep 2 ; done
+    # Probably there's a better solution for this.
+	sudo ip netns exec "$QROUTER_NAMESPACE" arp -a $VIP | tee -a $LOG
 	openstack loadbalancer amphora list | tee -a $LOG
-	sleep 4
+	sleep 2
 done

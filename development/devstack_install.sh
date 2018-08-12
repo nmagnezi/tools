@@ -38,7 +38,7 @@ chmod 700 /opt/stack/.ssh
 chmod 600 /opt/stack/.ssh/authorized_keys
 
 # Install git and tools
-yum install -y vim git tig wget || apt-get install -y vim git tig wget
+yum install -y vim git tig wget tmux screen || apt-get install -y vim git tig wget tmux screen
 
 # Clone my scripts
 sudo -u stack sudo git clone https://github.com/nmagnezi/scripts.git /opt/stack/scripts

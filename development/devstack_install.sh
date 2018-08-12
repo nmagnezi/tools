@@ -22,6 +22,9 @@ else
     export USER="ubuntu"
 fi
 
+# set locale if logged in from macOS
+echo "LANG=en_US.UTF-8" >> /etc/environment
+echo "LC_ALL=en_US.UTF-8" >> /etc/environment
 
 # create and set stack user as sudoer
 useradd -s /bin/bash -d /opt/stack -m stack

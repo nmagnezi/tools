@@ -9,7 +9,7 @@ export PROJECT_NAME="admin"
 export TOP_DIR="/opt/stack/devstack"
 
 # For diskimage-builder
-export OCTAVIA_DIR=/opt/stack/octavia
+export OCTAVIA_DIR="/opt/stack/octavia"
 export DIB_REPOLOCATION_amphora_agent=$OCTAVIA_DIR
 export DIB_REPOREF_amphora_agent=$(git --git-dir="$OCTAVIA_DIR/.git" log -1 --pretty="format:%H")
 
@@ -19,3 +19,4 @@ pushd $OCTAVIA_DIR/diskimage-create
 
 source ${TOP_DIR}/openrc ${PROJECT_NAME} ${PROJECT_NAME}
 openstack image create local_centos_amp --file /opt/stack/octavia/diskimage-create/amphora-x64-haproxy.qcow2 --tag amphora --disk-format qcow2 --container-format bare
+popd

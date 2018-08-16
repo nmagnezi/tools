@@ -37,6 +37,10 @@ chown -R stack:stack /opt/stack/.ssh/
 chmod 700 /opt/stack/.ssh
 chmod 600 /opt/stack/.ssh/authorized_keys
 
+# Make sure you get the latest pip & setuptools (prevent breakage on CentOS)
+easy_install pip
+pip install --upgrade pip setuptools
+
 # Install git and tools
 yum install -y vim git tig wget tmux screen || apt-get install -y vim git tig wget tmux screen
 

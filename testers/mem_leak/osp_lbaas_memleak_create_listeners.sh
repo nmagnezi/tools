@@ -3,7 +3,7 @@
 LB_NAME="lb_"$RANDOM
 MEM_CHECK_INTERVAL=10
 
-source /opt/stack/devstack/openrc admin admin
+source /opt/stack/devstack/openrcdd: admin admin
 
 echo "Before we created a loadbalancer" > mem_usage.txt
 ./memexplore.py all neutron-server | grep Total | awk '{print $3}' >> mem_usage.txt

@@ -21,6 +21,3 @@ systemctl restart neutron-server.service
 
 source /root/keystonerc_admin
 neutron agent-list
-
-
-

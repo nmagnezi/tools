@@ -7,19 +7,19 @@ ITERATIONS=100
 
 source /opt/stack/devstack/openrc admin admin
 
-echo "Before we created a loadbalancer" > mem_usage.txt
+echo "Before we created a loadbalancer" > mem_usage_create_delete.txt
 ./memexplore.py all neutron-server | grep Total | awk '{print $3}' >> mem_usage_create_delete.txt
 
 neutron lbaas-loadbalancer-create --name $LB_NAME private-subnet
 sleep 5
-echo "After we created a loadbalancer" >> mem_usage.txt
+echo "After we created a loadbalancer" >> mem_usage_create_delete.txt
 ./memexplore.py all neutron-server | grep Total | awk '{print $3}' >> mem_usage_create_delete.txt
 
-echo "Starting to create listeners"
+echo "Starting to create listeners" >> mem_usage_create_delete.txt
 
 for i in `seq 1 $ITERATIONS`
 do
-  ./memexplore.py all neutron-server | grep Total | awk '{print $3}' >>
+  ./memexplore.py all neutron-server | grep Total | awk '{print $3}' >> mem_usage_create_delete.txt
 
   for j in `seq 1 $LISTENERS_AMOUNT`
   do
@@ -28,7 +28,7 @@ do
   done
   for k in `seq 1 $LISTENERS_AMOUNT`
   do
-    neutron lbaas-listener-delete $k >> mem_usage_create_delete
+    neutron lbaas-listener-delete listener_$k >> mem_usage_create_delete.txt
     sleep 2
   done
 done

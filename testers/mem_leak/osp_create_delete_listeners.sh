@@ -23,14 +23,15 @@ do
 
   for j in `seq 1 $LISTENERS_AMOUNT`
   do
-    neutron lbaas-listener-create --loadbalancer $LB_NAME --protocol HTTP --protocol-port $j --name listener_$j -c name --format value >> mem_usage_create_delete.txt
+    neutron lbaas-listener-create --loadbalancer $LB_NAME --protocol HTTP --protocol-port $j --name "$LB_NAME"_listener_"$j" name --format value >> mem_usage_create_delete.txt
     sleep 2
   done
   for k in `seq 1 $LISTENERS_AMOUNT`
   do
-    neutron lbaas-listener-delete listener_$k >> mem_usage_create_delete.txt
+    neutron lbaas-listener-delete "$LB_NAME"_listener_"$k" >> mem_usage_create_delete.txt
     sleep 2
   done
 done
+neutron lbaas-loadbalancer-delete $LB_NAME >> mem_usage_create_delete.txt
 echo "All Done"  >> mem_usage_create_delete.txt
 /root/memexplore.py all neutron-server | grep Total | awk '{print $3}' >> mem_usage_create_delete.txt

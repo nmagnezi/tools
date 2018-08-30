@@ -3,7 +3,7 @@
 LB_NAME="lb_"$RANDOM
 MEM_CHECK_INTERVAL=10
 
-source /root/keystonerc_admin
+source /opt/stack/devstack/openrc admin admin
 
 echo "Before we created a loadbalancer" > mem_usage.txt
 /root/memexplore.py all neutron-server | grep Total | awk '{print $3}' >> mem_usage.txt
@@ -25,3 +25,5 @@ do
   fi
   sleep 3
 done
+neutron lbaas-loadbalancer-delete $LB_NAME >> mem_usage.txt
+echo "All Done"  >> mem_usage_create_delete.txt >> mem_usage.txt

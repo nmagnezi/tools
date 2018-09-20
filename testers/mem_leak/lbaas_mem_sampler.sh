@@ -65,4 +65,3 @@ do
 done
 neutron lbaas-loadbalancer-delete $LB_NAME | tee -a $LOG
 echo "All Done"  | tee -a $LOG
-echo `date +"%H:%M:%S"` " Sampling RAM for neutron-server after the first loadbalancer create" | tee -a $LOG

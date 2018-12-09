@@ -2,7 +2,7 @@
 
 # Just the basics of setting a cloud image based instance to be ready for devstack
 # To Copy & Run:
-# curl https://raw.githubusercontent.com/nmagnezi/scripts/master/development/devstack_install.sh  > devstack_install.sh ; bash devstack_install.sh
+# curl https://raw.githubusercontent.com/nmagnezi/tools/master/development/devstack_install.sh  > devstack_install.sh ; bash devstack_install.sh
 
 if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root"
@@ -44,9 +44,9 @@ pip install --upgrade pip setuptools
 # Install git and tools
 yum install -y vim git tig wget tmux screen || apt-get install -y vim git tig wget tmux screen
 
-# Clone my scripts
-sudo -u stack sudo git clone https://github.com/nmagnezi/scripts.git /opt/stack/scripts
-chown -R stack:stack /opt/stack/scripts
+# Clone my tools
+sudo -u stack sudo git clone https://github.com/nmagnezi/tools.git /opt/stack/tools
+chown -R stack:stack /opt/stack/tools
 
 
 sudo -u stack sudo git clone https://git.openstack.org/openstack-dev/devstack /opt/stack/devstack

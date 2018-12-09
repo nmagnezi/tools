@@ -7,9 +7,9 @@ sshpass -p ${password} ssh-copy-id -i ~/.ssh/id_rsa.pub ${username}@${ip_address
 
 # Get tox command
 if [ -z "$tests" ]; then
-   cmd=$(python scripts/gen_tempest_runner.py --directory ${directory})
+   cmd=$(python tools/gen_tempest_runner.py --directory ${directory})
 else
-   cmd=$(python scripts/gen_tempest_runner.py --tests ${tests} --directory ${directory})
+   cmd=$(python tools/gen_tempest_runner.py --tests ${tests} --directory ${directory})
 fi
 
 

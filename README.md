@@ -16,11 +16,11 @@
 ## Tester tools
 
 ### Octavia
-* [Amphorae State](test/octavia_amp_ha.sh)
-* [Test VIP](octavia_test_vip.sh)
+* [Amphorae State](testers/octavia_amp_ha.sh)
+* [Test VIP](testers/octavia_test_vip.sh)
 
 ### Octavia or Neutron-LBaaS
-* [Create Loadbalancer and HTTP servers for testing](test_lb.sh)
+* [Create Loadbalancer and HTTP servers for testing](testers/test_lb.sh)
 
 ### Other testers
 * [Scapy](testers/scapy_script.py)

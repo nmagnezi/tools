@@ -42,7 +42,7 @@ easy_install pip
 pip install --upgrade pip setuptools
 
 # Install git and tools
-yum install -y vim git tig wget tmux screen || apt-get install -y vim git tig wget tmux screen
+yum install -y vim git tig wget tmux screen || apt-get install -y vim git wget tmux screen
 
 # Clone my tools
 sudo -u stack sudo git clone https://github.com/nmagnezi/tools.git /opt/stack/tools

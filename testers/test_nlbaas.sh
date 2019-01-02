@@ -40,7 +40,7 @@ source ${TOP_DIR}/openrc ${PROJECT_NAME} ${PROJECT_NAME}
 
 # Create loadbalancer
 SUBNET_ID=$(openstack subnet show private-subnet -f value -c id)
-neutron lbaas-loadbalancer-create --name $LB_NAME $SUBNET_NAME
+neutron lbaas-loadbalancer-create --name $LB_NAME $SUBNET_ID
 
 # Create an SSH key to use for the instances
 DEVSTACK_LBAAS_SSH_KEY_NAME=DEVSTACK_LBAAS_SSH_KEY_RSA

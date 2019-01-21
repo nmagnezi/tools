@@ -58,7 +58,7 @@ openstack security group rule create --protocol tcp --dst-port 22:22 ${DEFAULT_S
 openstack security group rule create --protocol tcp --dst-port 80:80 ${DEFAULT_SEC_GROUP_ID}
 openstack security group rule create --protocol icmp ${DEFAULT_SEC_GROUP_ID}
 # Boot some instances
-NOVA_BOOT_ARGS="--key-name ${DEVSTACK_LBAAS_SSH_KEY_NAME} --image $(openstack image show cirros-0.3.5-x86_64-disk -f value -c id) --flavor 1 --nic net-id=$(openstack network show private -f value -c id)"
+NOVA_BOOT_ARGS="--key-name ${DEVSTACK_LBAAS_SSH_KEY_NAME} --image $(openstack image show cirros-0.4.0-x86_64-disk -f value -c id) --flavor 1 --nic net-id=$(openstack network show private -f value -c id)"
 
 openstack server create ${NOVA_BOOT_ARGS} node1
 openstack server create ${NOVA_BOOT_ARGS} node2

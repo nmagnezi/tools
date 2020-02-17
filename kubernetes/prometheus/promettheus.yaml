@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: prometheus
+spec:
+  serviceAccountName: prometheus
+  remoteWrite:
+    - url: "http://10.19.41.1:31599/api/v1/receive"
+      writeRelabelConfigs:
+      - sourceLabels: [__name__]
+        replacement: Spoke_Obs_test
+        targetLabel: cluster
+      tlsConfig:
+        insecureSkipVerify: true
+  serviceMonitorSelector:
+    matchLabels:
+      team: frontend
+  resources:
+    requests:
+      memory: 400Mi
+  enableAdminAPI: false

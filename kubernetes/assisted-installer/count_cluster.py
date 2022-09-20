@@ -1,6 +1,7 @@
 import json
 import logging
 import requests
+import pprint
 import subprocess
 import time
 
@@ -13,13 +14,11 @@ STAGE = 'https://api.stage.openshift.com/api/assisted-install/v2'
 
 URL = PROD
 HOSTS_GET_ATTEMPTS = 3
-DOWNLOAD_FILES = True
+DOWNLOAD_FILES = False
 TOKEN = ''
 
 LOG_DEBUG = False
 LOG = logging.getLogger(__name__)
-
-
 
 
 def configure_logger(debug_mode):
@@ -133,14 +132,47 @@ def compare_macs(infraenv, hosts):
     return static_network_config_mac_list == hosts_inventory_mac_list
 
 
+def update_cluster_stats(stats, infraenv_cluster_status):
+    try:
+        stats[infraenv_cluster_status] += 1
+    except KeyError:
+        stats[infraenv_cluster_status] = 1
+
+
+def no_mac_coverage_user_list(stats, user_types, infraenv):
+    if '@' in infraenv['user_name']:
+        key = infraenv['user_name']
+    else:
+        key = f"{infraenv['user_name']}@{infraenv['email_domain']}"
+
+    if 'redhat' in key:
+        user_types['redhat'] +=1
+    elif 'ibm' in key:
+        user_types['ibm'] += 1
+    else:
+        user_types['external'] += 1
+
+    try:
+        stats[key] += 1
+    except KeyError:
+        stats[key] = 1
+
+
 if __name__ == '__main__':
     configure_logger(LOG_DEBUG)
     cluster_states = {'no_status': 0}
+    covering_all_macs_cluster_states = {'no_status': 0}
+    covering_not_all_macs_cluster_states = {'no_status': 0}
+
+    user_types = {'redhat': 0, 'ibm': 0, 'external': 0}
+
+    not_covering_all_macs_user_states = dict()
     count_static_network_configs = 0
     count_unbound_infraenvs = 0
     cluster_not_found = 0
     infra_env_with_no_hosts = 0
     covering_all_macs = 0
+    not_covering_all_macs = 0
 
     clusters = get_clusters(URL, DOWNLOAD_FILES)
     infraenvs = get_infraenvs(URL, DOWNLOAD_FILES)
@@ -171,11 +203,15 @@ if __name__ == '__main__':
                 if not hosts.get(infraenv['id']):
                     infra_env_with_no_hosts += 1
                 else:
-                    covering_all_macs += 1 if compare_macs(infraenv, hosts) else 0
-                try:
-                    cluster_states[infraenv_cluster_status] += 1
-                except KeyError:
-                    cluster_states[infraenv_cluster_status] = 1
+                    if compare_macs(infraenv, hosts):
+                        covering_all_macs += 1
+                        update_cluster_stats(covering_all_macs_cluster_states, infraenv_cluster_status)
+                    else:
+                        not_covering_all_macs += 1
+                        update_cluster_stats(covering_not_all_macs_cluster_states, infraenv_cluster_status)
+                        no_mac_coverage_user_list(not_covering_all_macs_user_states, user_types, infraenv)
+
+                update_cluster_stats(cluster_states, infraenv_cluster_status)
 
     # Results
     LOG.info(f"found {len(clusters)} clusters and {len(infraenvs)} infraenvs total")
@@ -184,8 +220,15 @@ if __name__ == '__main__':
 
     LOG.info(f"found {len(infraenvs)-count_static_network_configs} infraenvs without static_network_configs")
     LOG.info(f"found {count_static_network_configs} infraenvs with static_network_configs. breakdown by status:")
-    LOG.info(cluster_states)
+    pprint.pprint(cluster_states)
     LOG.info(f"found that out of {count_static_network_configs} infraenvs with static_network_configs"
              f" --> {covering_all_macs} covering all macs ; {infra_env_with_no_hosts} infraenv with no hosts")
-
-
+    LOG.info(f"found {covering_all_macs} infraenvs with static_network_configs and covering all macs."
+             f" breakdown by status:")
+    pprint.pprint(covering_all_macs_cluster_states)
+    LOG.info(f"found {not_covering_all_macs} Infraenvs with no full mac address coverage. breakdown by status:")
+    pprint.pprint(covering_not_all_macs_cluster_states)
+    LOG.info("user types:")
+    pprint.pprint(user_types)
+    LOG.info("Breakdown by users and infraenv count")
+    pprint.pprint(not_covering_all_macs_user_states)

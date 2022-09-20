@@ -7,17 +7,19 @@ import time
 CLUSTERS_FILE = './data/clusters.json'
 INFRAENV_FILE = './data/infraenvs.json'
 HOSTS_FILE = './data/hosts.json'
+
+PROD = 'https://api.openshift.com/api/assisted-install/v2'
+STAGE = 'https://api.stage.openshift.com/api/assisted-install/v2'
+
+URL = PROD
 HOSTS_GET_ATTEMPTS = 3
 DOWNLOAD_FILES = True
-LOG_DEBUG = False
+TOKEN = ''
 
+LOG_DEBUG = False
 LOG = logging.getLogger(__name__)
 
 
-# prod
-URL = 'https://api.openshift.com/api/assisted-install/v2'
-# staging
-# URL = 'https://api.stage.openshift.com/api/assisted-install/v2'
 
 
 def configure_logger(debug_mode):
@@ -26,7 +28,10 @@ def configure_logger(debug_mode):
         format='%(asctime)s :: %(name)s :: %(levelname)s :: %(message)s'
     )
 
+
 def get_token():
+    if TOKEN:
+        return TOKEN
     return subprocess.check_output('ocm token', shell=True).decode("utf-8")[:-1]
 
 
@@ -181,6 +186,6 @@ if __name__ == '__main__':
     LOG.info(f"found {count_static_network_configs} infraenvs with static_network_configs. breakdown by status:")
     LOG.info(cluster_states)
     LOG.info(f"found that out of {count_static_network_configs} infraenvs with static_network_configs"
-          f" --> {covering_all_macs} covering all macs ; {infra_env_with_no_hosts} infraenv with no hosts")
+             f" --> {covering_all_macs} covering all macs ; {infra_env_with_no_hosts} infraenv with no hosts")
 
 

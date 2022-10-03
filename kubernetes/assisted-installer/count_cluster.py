@@ -132,6 +132,31 @@ def compare_macs(infraenv, hosts):
     return static_network_config_mac_list == hosts_inventory_mac_list
 
 
+def get_dhcp_interfaces_macs_list(infraenv, hosts, static_network_config_mac_list):
+    result = list()
+    infraenv_id = infraenv['id']
+    hosts_list = hosts.get(infraenv_id)
+    if not hosts_list:
+        return []
+    for host in hosts_list[0:2]:
+        host_inventory = json.loads(host['inventory'])
+        for interface in host_inventory['interfaces']:
+            if ((interface.get('ipv4_addresses') or interface.get('ipv6_addresses')) and interface['mac_address']
+                    not in static_network_config_mac_list):
+                result.append(interface['mac_address'])
+    return result
+
+
+def mixed_network_config(infraenv, hosts):
+    static_network_config_mac_list = build_static_network_config_mac_list(infraenv)
+    if not static_network_config_mac_list:
+        return False
+    hosts_dhcp_interfaces_mac_list = get_dhcp_interfaces_macs_list(infraenv, hosts, static_network_config_mac_list)
+    if hosts_dhcp_interfaces_mac_list:
+        LOG.debug(f"infraenv {infraenv['id']}, has hosts with both nmstate and interfaces that got an IP via dhcp."
+                  f" MAC Addresses: {hosts_dhcp_interfaces_mac_list}")
+    return bool(hosts_dhcp_interfaces_mac_list)
+
 def update_cluster_stats(stats, infraenv_cluster_status):
     try:
         stats[infraenv_cluster_status] += 1
@@ -173,6 +198,7 @@ if __name__ == '__main__':
     infra_env_with_no_hosts = 0
     covering_all_macs = 0
     not_covering_all_macs = 0
+    clusters_with_nmstate_and_dhcp = 0
 
     clusters = get_clusters(URL, DOWNLOAD_FILES)
     infraenvs = get_infraenvs(URL, DOWNLOAD_FILES)
@@ -210,6 +236,8 @@ if __name__ == '__main__':
                         not_covering_all_macs += 1
                         update_cluster_stats(covering_not_all_macs_cluster_states, infraenv_cluster_status)
                         no_mac_coverage_user_list(not_covering_all_macs_user_states, user_types, infraenv)
+                        if mixed_network_config(infraenv, hosts):
+                            clusters_with_nmstate_and_dhcp += 1
 
                 update_cluster_stats(cluster_states, infraenv_cluster_status)
 
@@ -223,6 +251,9 @@ if __name__ == '__main__':
     pprint.pprint(cluster_states)
     LOG.info(f"found that out of {count_static_network_configs} infraenvs with static_network_configs"
              f" --> {covering_all_macs} covering all macs ; {infra_env_with_no_hosts} infraenv with no hosts")
+    LOG.info(f"out of {count_static_network_configs-covering_all_macs-infra_env_with_no_hosts} infraenvs with hosts "
+             f"and static_network_configs partial mac coverage, found that {clusters_with_nmstate_and_dhcp} "
+             f"infraenvs mix both static_network_configs and dhcp.")
     LOG.info(f"found {covering_all_macs} infraenvs with static_network_configs and covering all macs."
              f" breakdown by status:")
     pprint.pprint(covering_all_macs_cluster_states)

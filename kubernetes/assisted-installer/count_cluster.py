@@ -183,8 +183,7 @@ def no_mac_coverage_user_list(stats, user_types, infraenv):
         stats[key] = 1
 
 
-if __name__ == '__main__':
-    configure_logger(LOG_DEBUG)
+def nmstate_stats(clusters, infraenvs, hosts):
     cluster_states = {'no_status': 0}
     covering_all_macs_cluster_states = {'no_status': 0}
     covering_not_all_macs_cluster_states = {'no_status': 0}
@@ -199,10 +198,6 @@ if __name__ == '__main__':
     covering_all_macs = 0
     not_covering_all_macs = 0
     clusters_with_nmstate_and_dhcp = 0
-
-    clusters = get_clusters(URL, DOWNLOAD_FILES)
-    infraenvs = get_infraenvs(URL, DOWNLOAD_FILES)
-    hosts = get_hosts(URL, DOWNLOAD_FILES, infraenvs)
 
     # Process infraenvs
     for infraenv in infraenvs:
@@ -263,3 +258,110 @@ if __name__ == '__main__':
     pprint.pprint(user_types)
     LOG.info("Breakdown by users and infraenv count")
     pprint.pprint(not_covering_all_macs_user_states)
+
+
+def config_has_bonds(static_network_config):
+    if not static_network_config:
+        return False
+    if 'bond' in static_network_config:
+        return True
+    return False
+
+
+def mixed_bonds_base_on_hosts_inventory(infraenv, hosts):
+    infraenv_id = infraenv['id']
+    hosts_list = hosts.get(infraenv_id)
+    if not hosts_list:
+        return []
+
+    print(infraenv_id)
+    roles = set()
+
+    for host in hosts_list:
+        host_inventory = json.loads(host['inventory'])
+        interface_types = set()
+        roles.add(host['role'])
+        for interface in host_inventory['interfaces']:
+            interface_types.add(interface['type'])
+
+
+        if host['role'] == 'master' and 'bond' in interface_types:
+            return False
+        if host['role'] == 'worker' and 'bond' not in interface_types:
+            return False
+
+    if 'worker' in roles and 'master' in roles:
+        LOG.info(f"infraenv {infraenv_id} has a mixed config")
+        hosts_list = hosts.get(infraenv_id)
+        for host in hosts_list:
+            host_inventory = json.loads(host['inventory'])
+            for interface in host_inventory['interfaces']:
+                LOG.info(f"host {host['id']}: role {host['role']} interface {interface['type']} with mtu {interface['mtu']}")
+
+    return 'worker' in roles and 'master' in roles
+
+
+def bond_mix(clusters, infraenvs, hosts):
+    cluster_states = {'no_status': 0}
+    no_bonds = 0
+    count_static_network_configs = 0
+    count_unbound_infraenvs = 0
+    cluster_not_found = 0
+    infraenvs_mixed_bonds = 0
+
+    # Process infraenvs
+    for infraenv in infraenvs:
+        static_network_config = infraenv.get('static_network_config')
+
+        # Do not process infraenvs with no static_network_config
+        if not (static_network_config and static_network_config != ''):
+            continue
+
+        count_static_network_configs += 1
+
+        if not config_has_bonds(static_network_config):
+            no_bonds += 1
+            continue
+
+        cluster_id = infraenv.get('cluster_id')
+
+        if not (cluster_id and cluster_id != ''):
+            count_unbound_infraenvs += 1
+            continue
+
+        infraenv_cluster = clusters.get(cluster_id)
+        if not infraenv_cluster:
+            cluster_not_found += 1
+            continue
+
+        if not mixed_bonds_base_on_hosts_inventory(infraenv, hosts):
+            continue
+
+
+        infraenvs_mixed_bonds += 1
+
+        infraenv_cluster_status = infraenv_cluster.get('status')
+
+        if not infraenv_cluster_status or infraenv_cluster_status == '':
+            cluster_states['no_status'] += 1
+        else:
+            update_cluster_stats(cluster_states, infraenv_cluster_status)
+
+    LOG.info(f"found: {count_unbound_infraenvs} unbounded infraenvs")
+    LOG.info(f"found: {cluster_not_found} infraenvs that point to a cluster that cannot be found\n")
+    LOG.info(f"found {len(infraenvs) - count_static_network_configs} infraenvs without static_network_configs")
+    LOG.info(f"found {count_static_network_configs} infraenvs with static_network_configs. Out of which "
+             f"{count_static_network_configs-no_bonds} with bonds and "
+             f"{no_bonds} infraenvs with no bonds.")
+
+    LOG.info(f"found {infraenvs_mixed_bonds} infraenvs with mixed bonds config")
+    pprint.pprint(cluster_states)
+
+
+if __name__ == '__main__':
+    configure_logger(LOG_DEBUG)
+    clusters = get_clusters(URL, DOWNLOAD_FILES)
+    infraenvs = get_infraenvs(URL, DOWNLOAD_FILES)
+    hosts = get_hosts(URL, DOWNLOAD_FILES, infraenvs)
+
+    bond_mix(clusters, infraenvs, hosts)

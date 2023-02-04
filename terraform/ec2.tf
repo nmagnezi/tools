@@ -140,9 +140,9 @@ module "ec2" {
 
   #instance
   instance_enabled = true
-  instance_count   = 1
+  instance_count   = 2
   ami              = "ami-08d658f84a6d84a80"
-  instance_type    = "t2.nano"
+  instance_type    = "t2.small"
   monitoring       = false
   tenancy          = "default"
   hibernation      = false
